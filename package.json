@@ -5,6 +5,7 @@
     "express": "^4.19.2",
     "fs": "^0.0.1-security",
     "json2csv": "^6.0.0-alpha.2",
+    "parse": "^5.1.0",
     "parser": "^0.1.4",
     "pg": "^8.11.5"
   }
