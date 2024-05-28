@@ -18,17 +18,28 @@
 
         <h1>Leveling Data Collection</h1>
 
-        <form id="levelingDataForm">
-            <input type="number" id="pointId" placeholder="Point ID" required>
-            <input type="number" step="0.001" id="backSight" placeholder="Back Sight">
-            <input type="number" step="0.001" id="intermediateSight" placeholder="Intermediate Sight">
-            <input type="number" step="0.001" id="foreSight" placeholder="Fore Sight">
-            <input type="number text" id="distance" placeholder="Distance" required>
-            <textarea id="comments" placeholder="Comments"></textarea>
+
+        <form id="projectTitleForm">
+            <h1>Enter Project Title</h1>
+            <input type="text" id="projectTitle" placeholder="Project Title" required>
             <button type="submit">Submit</button>
         </form>
-        <div class="download">
-            <button id="downloadCsv">Download CSV</button>
+
+        <div id="dataEntry" style="display:none">
+            <h2>enter data</h2>
+            <form id="levelingDataForm">
+
+                <input type="number" id="pointId" placeholder="Point ID" required>
+                <input type="number" step="0.001" id="backSight" placeholder="Back Sight">
+                <input type="number" step="0.001" id="intermediateSight" placeholder="Intermediate Sight">
+                <input type="number" step="0.001" id="foreSight" placeholder="Fore Sight">
+                <input type="number" id="distance" placeholder="Distance" required>
+                <textarea id="comments" placeholder="Comments"></textarea>
+                <button type="submit">Submit Data</button>
+            </form>
+            <div class="download">
+                <button id="downloadCsv">Download CSV</button>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
