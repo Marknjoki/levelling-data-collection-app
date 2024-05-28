@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 const client = new Client({
     user: "postgres",
     host: "localhost",
-    database: "level data",
+    database: "Level_data_store",
     password: "postgres",
     port: 5432,
 
@@ -27,47 +27,66 @@ client.connect()
 
 
 app.post('/leveling_data', async (req, res) => {
-    const { pointId, backSight, intermediateSight, foreSight, distance, comments } = req.body;
+    const { projectTitle, dataEntry } = req.body;
+
     console.log("Received data:", req.body)
-    if (!Number.isInteger(pointId)) {
-        console.error('Invalid pointId:', pointId);
-        return res.status(400).json({ error: 'Invalid pointId' });
-    }
+
     try {
-        const result = await client.query(
-            'INSERT INTO leveling_data (point_id, back_sight, intermediate_sight, fore_sight, distance, comments) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [pointId, backSight, intermediateSight, foreSight, distance, comments]
-        );
-        res.status(201).json(result.rows[0]);
+        // Insert the project title if it doesn't exist
+        let result = await client.query('INSERT INTO projects (title) VALUES ($1) ON CONFLICT (title) DO NOTHING RETURNING id', [projectTitle]);
+        let projectId;
+
+        if (result.rowCount > 0) {
+            projectId = result.rows[0].id;
+        } else {
+            result = await client.query('SELECT id FROM projects WHERE title = $1', [projectTitle]);
+            projectId = result.rows[0].id;
+        }
+
+        // Insert the data entries
+        for (const entry of dataEntry) {
+            await client.query('INSERT INTO data_entries (project_id, point_id, back_sight, intermediate_sight, fore_sight, distance, comments) VALUES ($1, $2, $3, $4, $5, $6, $7)', [projectId, entry.pointId, entry.backSight, entry.intermediateSight, entry.foreSight, entry.distance, entry.comments]);
+        }
+        res.status(201).send('Data saved successfully');
     } catch (err) {
         console.error('Error saving data', err);
         res.status(500).json({ error: 'Error saving data' });
     }
 });
 
-app.get('/download_csv', async (req, res) => {
+app.post('/download_csv', async (req, res) => {
+    const { projectTitle } = req.body;
+
     try {
-        const result = await client.query('SELECT * FROM leveling_data');
-        const fields = ['point_id', 'back_sight', 'intermediate_sight', 'fore_sight', 'distance', 'comments', 'timestamp'];
+        // Retrieve the project ID
+        const projectResult = await client.query('SELECT id FROM projects WHERE title = $1', [projectTitle]);
+        if (projectResult.rowCount === 0) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+        const projectId = projectResult.rows[0].id;
+
+        // Retrieve the data entries for the CSV generation
+        const entriesResult = await client.query('SELECT point_id, back_sight, intermediate_sight, fore_sight, distance, comments FROM data_entries WHERE project_id = $1', [projectId]);
+
+        // Generate the CSV
+        const fields = ['point_id', 'back_sight', 'intermediate_sight', 'fore_sight', 'distance', 'comments'];
         const opts = { fields };
         const parser = new Parser(opts);
-        const csv = parser.parse(result.rows);
-        const filePath = path.join(__dirname, 'leveling_data.csv');
-        fs.writeFileSync(filePath, csv);
-        res.download(filePath, 'leveling_data.csv', (err) => {
-            if (err) {
-                console.error('Error downloading the file:', err);
-            }
-            fs.unlinkSync(filePath);
-        });
+        let csv = parser.parse(entriesResult.rows);
+        csv = `${projectTitle}\n\n${csv}`;
+
+        // Send the CSV file as a response
+        res.header('Content-Type', 'text/csv');
+        res.attachment(`${projectTitle}.csv`);
+        res.send(csv);
     } catch (err) {
-        console.error('Error generating CSV', err);
-        res.status(500).json({ error: 'Error generating CSV' });
+        console.error(err);
+        res.status(500).send('Error generating CSV');
     }
+
+
+
 });
-
-
-
 
 app.listen(3000, () => {
     console.log('Server running on port 3000');
