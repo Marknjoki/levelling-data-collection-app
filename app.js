@@ -45,7 +45,7 @@ app.post('/leveling_data', async (req, res) => {
 
         // Insert the data entries
         for (const entry of dataEntry) {
-            await client.query('INSERT INTO data_entries (project_id, point_id, back_sight, intermediate_sight, fore_sight, distance, comments) VALUES ($1, $2, $3, $4, $5, $6, $7)', [projectId, entry.pointId, entry.backSight, entry.intermediateSight, entry.foreSight, entry.distance, entry.comments]);
+            await client.query('INSERT INTO data_entries (project_id, point_id, back_sight, intermediate_sight, fore_sight, distance, comments,reduced_level) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [projectId, entry.pointId, entry.backSight, entry.intermediateSight, entry.foreSight, entry.distance, entry.comments, entry.reducedLevel]);
         }
         res.status(201).send('Data saved successfully');
     } catch (err) {
@@ -66,10 +66,10 @@ app.post('/download_csv', async (req, res) => {
         const projectId = projectResult.rows[0].id;
 
         // Retrieve the data entries for the CSV generation
-        const entriesResult = await client.query('SELECT point_id, back_sight, intermediate_sight, fore_sight, distance, comments FROM data_entries WHERE project_id = $1', [projectId]);
+        const entriesResult = await client.query('SELECT point_id, back_sight, intermediate_sight, fore_sight, distance, comments, reduced_level FROM data_entries WHERE project_id = $1', [projectId]);
 
         // Generate the CSV
-        const fields = ['point_id', 'back_sight', 'intermediate_sight', 'fore_sight', 'distance', 'comments'];
+        const fields = ['point_id', 'back_sight', 'intermediate_sight', 'fore_sight', 'reduced_level', 'distance', 'comments'];
         const opts = { fields };
         const parser = new Parser(opts);
         let csv = parser.parse(entriesResult.rows);

@@ -16,23 +16,25 @@
 
     <div class="container">
 
-        <h1>Leveling Data Collection</h1>
+
 
 
         <form id="projectTitleForm">
-            <h1>Enter Project Title</h1>
+            <h1>Leveling Data Collection</h1>
+            <h2>Enter Project Title</h2>
             <input type="text" id="projectTitle" placeholder="Project Title" required>
             <button type="submit">Submit</button>
         </form>
 
         <div id="dataEntry" style="display:none">
-            <h2>enter data</h2>
+            <h2>Enter Data</h2>
             <form id="levelingDataForm">
 
                 <input type="number" id="pointId" placeholder="Point ID" required>
                 <input type="number" step="0.001" id="backSight" placeholder="Back Sight">
                 <input type="number" step="0.001" id="intermediateSight" placeholder="Intermediate Sight">
                 <input type="number" step="0.001" id="foreSight" placeholder="Fore Sight">
+                <input type="number" step="0.001" id="reducedLevel" placeholder="Reduced Level">
                 <input type="number" id="distance" placeholder="Distance" required>
                 <textarea id="comments" placeholder="Comments"></textarea>
                 <button type="submit">Submit Data</button>

@@ -29,8 +29,9 @@ document.getElementById('levelingDataForm').addEventListener('submit', async (e)
     const foreSight = parseFloat(document.getElementById('foreSight').value);
     const distance = document.getElementById('distance').value;
     const comments = document.getElementById('comments').value;
+    const reducedLevel = parseFloat(document.getElementById('reducedLevel').value);
     dataEntry.push({
-        pointId, backSight, intermediateSight, foreSight, distance, comments
+        pointId, backSight, intermediateSight, foreSight, distance, comments, reducedLevel
     });
 
     document.getElementById("levelingDataForm").reset();
